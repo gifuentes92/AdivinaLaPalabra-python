@@ -10,54 +10,80 @@ vidas= 5
 
 import random
 
-letras_adivinadas= []
+
 
 def saludo():
     print("~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°")
-    print("°~ Bienvenido al juego de adivinar la palabra~°")
+    print("°~ Bienvenido al juego de adivinar la palabra ~°")
     print("~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°")
 
 
 def elegir_palabra():
     return random.choice(palabras)
+   
 
-palabra = elegir_palabra()
 
-def mostrar_palabra(palabra):
-    print(" ")
-    print("~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°")
-    print(" ")
+
+def mostrar_palabra(palabra, vidas):
+    print("\n~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°\n")
     print(f"La palabra a adivinar tiene {len(palabra)} letras")
-    for letra in palabra:
-        print("-", end=" ")
-        """if letra in palabra and letras_adivinadas:
-         print(letra, end=" ")
-        else:
-            print("-", end=" ")"""
-    print(f"Tenés {vidas} vidas")
-    print("")
+    print(f"Tenés {vidas} vidas, ¡mucha suerte!\n")
     print("~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°")
-
 
 
 def adivinar_palabra(vidas, palabra):
- while vidas > 0:
-    letra_ingresada = str(input("\n Por favor ingresá una letra: "))
+    letras_adivinar = set(palabra)
+    letras_adivinadas = set()
+    letras_incorrectas = set()
 
-    if letra_ingresada.lower in palabra:
-        print(f"Bien! La letra {letra_ingresada} está en la palabra.")
-        letras_adivinadas.append(letra_ingresada.lower())
+ #cambio de método para mostrar guiones para la palabra oculta
+    while vidas > 0:
+        palabra_oculta = ''.join([letra if letra in letras_adivinadas else '-' for letra in palabra])
+        print(f"Palabra: {palabra_oculta}")
+        print(f"Te quedan {vidas} vidas")
+        print(f"Letras adivinadas: {', '.join(sorted(letras_adivinadas))}")
+        print(f"Letras incorrectas: {', '.join(sorted(letras_incorrectas))}")
+        
+        # Verificar si se adivinó toda la palabra
+        if letras_adivinar == letras_adivinadas:
+            return True
+
+        letra_ingresada = input("\nPor favor ingresa una letra: ").lower()
+        
+        if not letra_ingresada.isalpha() or len(letra_ingresada) != 1:
+            print("Debe ser una sola letra, por favor intenta de nuevo.")
+            continue
+        
+        if letra_ingresada in letras_adivinadas or letra_ingresada in letras_incorrectas:
+            print("Ya ingresaste esa letra, por favor intenta de nuevo.")
+            continue
+
+        if letra_ingresada in letras_adivinar:
+            print(f"¡Bien! La letra {letra_ingresada} está en la palabra.")
+            letras_adivinadas.add(letra_ingresada)
+        else:
+            print(f"La letra {letra_ingresada} no está en la palabra, intenta de nuevo.")
+            letras_incorrectas.add(letra_ingresada)
+            vidas -= 1
+    
+    return False
+    
+    
+
+
+
+def fin_del_juego(ganaste, palabra):
+    print("\n~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°\n")
+    if ganaste:
+        print(f"¡Felicidades, ganaste! La palabra era {palabra}")
     else:
-        print(f"La letra {letra_ingresada} no está en la palabra.")
-        vidas -= 1 
+        print(f"Perdiste, la palabra era {palabra}")
+    print("\n~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°")
 
-    if not letra_ingresada.isalpha():
-        print("debe ser una letra, por favor intentá de nuevo")
-        continue
-
-    mostrar_palabra(palabra)
-    print(f"Te quedan {vidas} vidas")
-
+# Inicio del juego
 saludo()
-mostrar_palabra(palabra)
-adivinar_palabra(vidas, palabra)
+palabra= elegir_palabra()
+mostrar_palabra(palabra, vidas)
+#condición de ganar agragada para exportar a la otra función
+ganaste = adivinar_palabra(vidas, palabra)
+fin_del_juego(ganaste, palabra)
